@@ -12,7 +12,7 @@ def _process_graph(args):
     """
     gid, group_ids, Xsp, x_vec, x_scal, x_cont, graph_radius = args
     g = np.where(group_ids == gid)[0]
-    xsp = Xsp[g]
+    xsp = Xsp[g] 
     x = x_vec[g]
     y = x_scal[g]
     z = x_cont[g].mean(axis=0)
@@ -21,11 +21,13 @@ def _process_graph(args):
                                  graph_radius, 
                                  mode='connectivity',
                                  include_self=False).tocoo()
+    x = x.reshape([-1,x.shape[-1]//3, 3])
+
     graph = jraph.GraphsTuple(
                         nodes={'pos': xsp,
-                               'vectors': jnp.stack([np.stack([x[...,i], 
-                                                    x[...,i+1], 
-                                                    x[...,i+2]], axis=-1) for i in range(x.shape[-1]//3)],axis=1),
+                               'vectors': x, #jnp.stack([np.stack([x[...,i,:], 
+                                             #       x[...,i,:], 
+                                             #       x[...,i,:]], axis=-1) for i in range(x.shape[-1]//3)],axis=1),
                                'scalars': y},
                         senders=adj.row,
                         receivers=adj.col,
